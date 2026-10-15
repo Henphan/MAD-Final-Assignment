@@ -6,7 +6,7 @@ plugins {
 android {
     namespace = "com.example.travelplanner_finalassignment"
     compileSdk {
-        version = release(36) {
+        version = release(37) {
             minorApiLevel = 1
         }
     }
@@ -37,6 +37,9 @@ android {
     }
 }
 
+val lifecycleVersion = "2.11.0"
+val navVersion = "2.10.2"
+
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
@@ -53,4 +56,7 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleVersion")
+    implementation("androidx.navigation:navigation-compose:$navVersion")
+    implementation("androidx.datastore:datastore-preferences:1.2.1")
 }

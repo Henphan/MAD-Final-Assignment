@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -18,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,17 +27,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.travelplanner_finalassignment.ui.theme.TravelPlannerFinalAssignmentTheme
+import com.example.travelplanner_finalassignment.viewmodel.UserPreferenceViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserPreferencesScreen(){
+fun UserPreferenceScreen(viewModel: UserPreferenceViewModel){
     var sliderPosition by remember { mutableStateOf(0f) }
+
     val scope = rememberCoroutineScope()
-    var currTheme by remember { mutableStateOf("Light") }
-    if(sliderPosition == 0f) currTheme = "Light"
-    else if(sliderPosition == 1f) currTheme = "Dark"
+
+    val isDarkMode by viewModel.isDarkMode
+        .collectAsStateWithLifecycle(initialValue = false)
+
+    val currTheme = if(isDarkMode) "Dark" else "Light"
+
+    LaunchedEffect(isDarkMode) {
+        sliderPosition = if(isDarkMode) 1f else 0f
+    }
 
     Scaffold(
         topBar = {
@@ -71,7 +80,7 @@ fun UserPreferencesScreen(){
                     modifier = Modifier
                         .fillMaxWidth(),
                     textAlign = TextAlign.Center,
-                    text = "Theme: ${currTheme}"
+                    text = "Theme: $currTheme"
                 )
 
                 Slider(
@@ -81,6 +90,7 @@ fun UserPreferencesScreen(){
                         val target =
                             if(sliderPosition < 0.5f) 0f
                             else 1f
+                        viewModel.onThemeChange(target == 1f)
                         scope.launch {
                             animate(
                                 initialValue = sliderPosition,
@@ -101,10 +111,10 @@ fun UserPreferencesScreen(){
     }
 }
 
-@Composable
-@Preview
-fun UserPrefScreenPreview(){
-    TravelPlannerFinalAssignmentTheme {
-        UserPreferencesScreen()
-    }
-}
+//@Composable
+//@Preview
+//fun UserPrefScreenPreview(){
+//    TravelPlannerFinalAssignmentTheme {
+//        UserPreferenceScreen()
+//    }
+//}

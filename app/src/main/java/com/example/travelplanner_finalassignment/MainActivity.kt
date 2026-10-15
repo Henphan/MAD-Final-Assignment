@@ -9,18 +9,34 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.travelplanner_finalassignment.model.PreferencesRepository
 import com.example.travelplanner_finalassignment.ui.theme.TravelPlannerFinalAssignmentTheme
-import com.example.travelplanner_finalassignment.view.UserPreferencesScreen
+import com.example.travelplanner_finalassignment.view.UserPreferenceScreen
+import com.example.travelplanner_finalassignment.viewmodel.UserPreferenceViewModel
+import com.example.travelplanner_finalassignment.viewmodel.UserPreferenceViewModelFactory
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        val repository = PreferencesRepository(applicationContext)
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val factory = remember(repository){
+                UserPreferenceViewModelFactory(repository)
+            }
+
+            val viewModel: UserPreferenceViewModel = viewModel(
+                factory = factory
+            )
+
             TravelPlannerFinalAssignmentTheme {
-                UserPreferencesScreen()
+                UserPreferenceScreen(viewModel)
             }
         }
     }
