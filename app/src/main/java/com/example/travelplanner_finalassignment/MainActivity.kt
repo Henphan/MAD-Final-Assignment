@@ -21,18 +21,20 @@ import com.example.travelplanner_finalassignment.viewmodel.UserPreferenceViewMod
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
+        // Initialising the repository
         val repository = PreferencesRepository(applicationContext)
 
-        super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            //Initialising the factory, which is what creates the ViewModel
             val factory = remember(repository){
                 UserPreferenceViewModelFactory(repository)
             }
 
-            val viewModel: UserPreferenceViewModel = viewModel(
-                factory = factory
+            val viewModel: UserPreferenceViewModel =  viewModel(
+                factory = factory // allows Android to reuse the existing viewModel where possible
             )
 
             TravelPlannerFinalAssignmentTheme {

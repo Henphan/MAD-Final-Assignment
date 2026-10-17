@@ -35,15 +35,19 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserPreferenceScreen(viewModel: UserPreferenceViewModel){
+    // remembers the state of the button
     var sliderPosition by remember { mutableStateOf(0f) }
 
     val scope = rememberCoroutineScope()
 
+    // loads the previous isDarkMode value
     val isDarkMode by viewModel.isDarkMode
         .collectAsStateWithLifecycle(initialValue = false)
 
+    // sets the theme to the previously set theme
     val currTheme = if(isDarkMode) "Dark" else "Light"
 
+    // unsure
     LaunchedEffect(isDarkMode) {
         sliderPosition = if(isDarkMode) 1f else 0f
     }
@@ -85,14 +89,14 @@ fun UserPreferenceScreen(viewModel: UserPreferenceViewModel){
 
                 Slider(
                     value = sliderPosition,
-                    onValueChange = {sliderPosition = it},
-                    onValueChangeFinished = {
+                    onValueChange = {sliderPosition = it}, // when slider is being moved --> follows the mouse
+                    onValueChangeFinished = { // when slider is let go --> snaps to one side
                         val target =
                             if(sliderPosition < 0.5f) 0f
                             else 1f
                         viewModel.onThemeChange(target == 1f)
                         scope.launch {
-                            animate(
+                            animate( // button animation stuff
                                 initialValue = sliderPosition,
                                 targetValue = target,
                                 animationSpec = spring()

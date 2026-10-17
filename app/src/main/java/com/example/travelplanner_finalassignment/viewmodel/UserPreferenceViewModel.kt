@@ -8,11 +8,11 @@ import kotlinx.coroutines.launch
 class UserPreferenceViewModel (
     private val repository: PreferencesRepository
 ): ViewModel(){
-    val isDarkMode = repository.isDarkMode
+    val isDarkMode = repository.isDarkMode // a Flow<Boolean> obtained from repository
 
-    fun onThemeChange(enabled: Boolean) {
-        viewModelScope.launch {
-            repository.setDarkMode(enabled)
+    fun onThemeChange(enabled: Boolean) { // runs when slider changes, requests to update the theme to the currently selected one
+        viewModelScope.launch { // starts a co-routine
+            repository.setDarkMode(enabled) // setDarkMode is a suspend function, must run in coroutine
         }
     }
 }
