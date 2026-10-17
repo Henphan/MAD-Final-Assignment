@@ -9,9 +9,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.travelplanner_finalassignment.model.PreferencesRepository
 import com.example.travelplanner_finalassignment.ui.theme.TravelPlannerFinalAssignmentTheme
@@ -37,7 +39,12 @@ class MainActivity : ComponentActivity() {
                 factory = factory // allows Android to reuse the existing viewModel where possible
             )
 
-            TravelPlannerFinalAssignmentTheme {
+            val isDarkMode by viewModel.isDarkMode
+                .collectAsStateWithLifecycle(initialValue = false) // gets current state of theme
+
+            TravelPlannerFinalAssignmentTheme (
+                darkTheme = isDarkMode // uses the system dark theme
+            ){
                 UserPreferenceScreen(viewModel)
             }
         }
