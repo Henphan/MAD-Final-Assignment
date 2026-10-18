@@ -1,4 +1,4 @@
-package com.example.travelplanner_finalassignment.ui
+package com.example.travelplanner_finalassignment.view
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

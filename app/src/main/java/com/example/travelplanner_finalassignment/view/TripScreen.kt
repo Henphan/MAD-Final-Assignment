@@ -1,4 +1,4 @@
-package com.example.travelplanner_finalassignment.ui
+package com.example.travelplanner_finalassignment.view
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,7 +37,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.travelplanner_finalassignment.model.Destination
 import com.example.travelplanner_finalassignment.viewmodel.AddCityResult
 import com.example.travelplanner_finalassignment.viewmodel.TripViewModel
@@ -46,12 +45,12 @@ import com.example.travelplanner_finalassignment.viewmodel.TripViewModel
 @Composable
 fun TripScreen(
     onBack: () -> Unit,
-    onOpenTrip: (Long) -> Unit,
-    vm: TripViewModel = viewModel()
+    onOpenTrip: (Int) -> Unit,
+    viewModel: TripViewModel
 ) {
     var showAddDialog by rememberSaveable { mutableStateOf(false) }
     var showNewTripDialog by rememberSaveable { mutableStateOf(false) }
-    val trip = vm.trip
+    val trip = viewModel.trip
 
     Scaffold(
         topBar = {
@@ -81,20 +80,20 @@ fun TripScreen(
     ) { innerPadding ->
         val contentModifier = Modifier.fillMaxSize().padding(innerPadding)
         when {
-            vm.isLoading -> Box(contentModifier, contentAlignment = Alignment.Center) {
+            viewModel.isLoading -> Box(contentModifier, contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
             trip == null -> Box(contentModifier.padding(16.dp), contentAlignment = Alignment.Center) {
                 Text("This trip could not be found.")
             }
             else -> CityList(
-                destinations = vm.destinations,
-                totalNights = vm.totalNights,
-                canChangeNights = vm::canChangeNights,
-                onChangeNights = vm::changeNights,
-                onMoveUp = vm::moveCityUp,
-                onMoveDown = vm::moveCityDown,
-                onRemove = vm::removeCity,
+                destinations = viewModel.destinations,
+                totalNights = viewModel.totalNights,
+                canChangeNights = viewModel::canChangeNights,
+                onChangeNights = viewModel::changeNights,
+                onMoveUp = viewModel::moveCityUp,
+                onMoveDown = viewModel::moveCityDown,
+                onRemove = viewModel::removeCity,
                 modifier = contentModifier
             )
         }
@@ -102,21 +101,21 @@ fun TripScreen(
 
     if (showAddDialog) {
         AddCityDialog(
-            searchState = vm.searchState,
-            onSearch = vm::searchCities,
-            onRetry = vm::retrySearch,
-            canChangeNights = vm::canChangeNights,
+            searchState = viewModel.searchState,
+            onSearch = viewModel::searchCities,
+            onRetry = viewModel::retrySearch,
+            canChangeNights = viewModel::canChangeNights,
             onAddCity = { city, nights ->
-                val result = vm.addCity(city, nights)
+                val result = viewModel.addCity(city, nights)
                 if (result == AddCityResult.ADDED) {
                     showAddDialog = false
-                    vm.clearSearch()
+                    viewModel.clearSearch()
                 }
                 result
             },
             onDismiss = {
                 showAddDialog = false
-                vm.clearSearch()
+                viewModel.clearSearch()
             }
         )
     }
@@ -124,7 +123,7 @@ fun TripScreen(
     if (showNewTripDialog) {
         AddTripDialog(
             onCreate = { name, startDate ->
-                val accepted = vm.createTrip(name, startDate, onCreated = onOpenTrip)
+                val accepted = viewModel.createTrip(name, startDate, onCreated = onOpenTrip)
                 if (accepted) showNewTripDialog = false
                 accepted
             },

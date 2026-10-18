@@ -1,4 +1,4 @@
-package com.example.travelplanner_finalassignment.ui
+package com.example.travelplanner_finalassignment.view
 
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -36,7 +36,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.travelplanner_finalassignment.model.Destination
 import com.example.travelplanner_finalassignment.model.googleMapsUrl
 import com.example.travelplanner_finalassignment.viewmodel.MapViewModel
@@ -66,10 +65,10 @@ private val markerHues = listOf(
 @Composable
 fun MapScreen(
     onBack: () -> Unit,
-    vm: MapViewModel = viewModel()
+    viewModel: MapViewModel
 ) {
     val context = LocalContext.current
-    val tripsOnMap = vm.tripsOnMap
+    val tripsOnMap = viewModel.tripsOnMap
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(LatLng(20.0, 0.0), 1f)
     }
@@ -108,14 +107,14 @@ fun MapScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 FilterChip(
-                    selected = vm.selectedTripId == null,
-                    onClick = { vm.selectTrip(null) },
+                    selected = viewModel.selectedTripId == null,
+                    onClick = { viewModel.selectTrip(null) },
                     label = { Text("All trips") }
                 )
-                vm.trips.forEach { trip ->
+                viewModel.trips.forEach { trip ->
                     FilterChip(
-                        selected = vm.selectedTripId == trip.id,
-                        onClick = { vm.selectTrip(trip.id) },
+                        selected = viewModel.selectedTripId == trip.id,
+                        onClick = { viewModel.selectTrip(trip.id) },
                         label = { Text(trip.name) }
                     )
                 }

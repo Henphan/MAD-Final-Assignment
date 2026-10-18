@@ -1,4 +1,4 @@
-package com.example.travelplanner_finalassignment.ui
+package com.example.travelplanner_finalassignment.view
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -28,15 +29,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.travelplanner_finalassignment.viewmodel.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    onOpenTrip: (Long) -> Unit,
+    onOpenTrip: (Int) -> Unit,
     onOpenMap: () -> Unit,
-    vm: HomeViewModel = viewModel()
+    onOpenSettings: () -> Unit,
+    viewModel: HomeViewModel
 ) {
     var showNewTripDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -52,6 +53,9 @@ fun HomeScreen(
                 actions = {
                     IconButton(onClick = onOpenMap) {
                         Icon(Icons.Filled.Map, contentDescription = "Show all trips on a map")
+                    }
+                    IconButton(onClick = onOpenSettings) {
+                        Icon(Icons.Filled.Settings, contentDescription = "Settings")
                     }
                 }
             )
@@ -69,7 +73,7 @@ fun HomeScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            items(vm.trips, key = { it.id }) { trip ->
+            items(viewModel.trips, key = { it.id }) { trip ->
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -86,7 +90,7 @@ fun HomeScreen(
     if (showNewTripDialog) {
         AddTripDialog(
             onCreate = { name, startDate ->
-                val accepted = vm.createTrip(name, startDate, onCreated = onOpenTrip)
+                val accepted = viewModel.createTrip(name, startDate, onCreated = onOpenTrip)
                 if (accepted) showNewTripDialog = false
                 accepted
             },

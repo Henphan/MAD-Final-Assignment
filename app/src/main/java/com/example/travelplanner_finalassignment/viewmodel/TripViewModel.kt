@@ -3,21 +3,17 @@ package com.example.travelplanner_finalassignment.viewmodel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
 import com.example.travelplanner_finalassignment.data.CitySearchService
-import com.example.travelplanner_finalassignment.data.TripRepository
+import com.example.travelplanner_finalassignment.model.AppRepository
 import com.example.travelplanner_finalassignment.model.CityResult
 import com.example.travelplanner_finalassignment.model.Destination
-import com.example.travelplanner_finalassignment.model.TransportMode
 import com.example.travelplanner_finalassignment.model.Trip
 import com.example.travelplanner_finalassignment.model.countNights
 import com.example.travelplanner_finalassignment.model.isSameCityAs
 import com.example.travelplanner_finalassignment.model.isValidTripName
 import com.example.travelplanner_finalassignment.model.isValidNights
-import com.example.travelplanner_finalassignment.ui.TripRoute
 import kotlinx.coroutines.launch
 import org.json.JSONException
 import java.io.IOException
@@ -34,9 +30,10 @@ sealed interface CitySearchState {
 
 enum class AddCityResult { ADDED, DUPLICATE, INVALID_NIGHTS }
 
-class TripViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
-
-    private val tripId: Long = savedStateHandle.toRoute<TripRoute>().tripId
+class TripViewModel(
+    private val repository: AppRepository,
+    private val tripId: Int
+) : ViewModel() {
 
     var trip by mutableStateOf<Trip?>(null)
         private set
@@ -57,22 +54,22 @@ class TripViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     init {
         viewModelScope.launch {
-            TripRepository.observeTrip(tripId).collect { result ->
+            repository.getTrip(tripId).collect { result ->
                 trip = result
                 isLoading = false
             }
         }
         viewModelScope.launch {
-            TripRepository.observeDestinations(tripId).collect { result ->
+            repository.observeForTrip(tripId).collect { result ->
                 destinations = result
             }
         }
     }
 
-    fun createTrip(name: String, startDate: Long, onCreated: (Long) -> Unit): Boolean {
+    fun createTrip(name: String, startDate: Long, onCreated: (Int) -> Unit): Boolean {
         if (!isValidTripName(name)) return false
         viewModelScope.launch {
-            val newTripId = TripRepository.createTrip(name.trim(), startDate)
+            val newTripId = repository.createTrip(name.trim(), startDate).toInt()
             onCreated(newTripId)
         }
         return true
@@ -110,20 +107,19 @@ class TripViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
         if (!isValidNights(nights)) return AddCityResult.INVALID_NIGHTS
         if (destinations.any { it.isSameCityAs(city) }) return AddCityResult.DUPLICATE
         viewModelScope.launch {
-            TripRepository.addDestination(
+            repository.addDestination(
                 tripId = tripId,
                 name = city.name,
                 latitude = city.latitude,
                 longitude = city.longitude,
-                nights = nights,
-                transport = TransportMode.NONE
+                nights = nights
             )
         }
         return AddCityResult.ADDED
     }
 
     fun removeCity(destination: Destination) {
-        viewModelScope.launch { TripRepository.removeDestination(destination) }
+        viewModelScope.launch { repository.removeDestination(destination) }
     }
 
     fun canChangeNights(nights: Int, change: Int): Boolean = isValidNights(nights + change)
@@ -131,15 +127,15 @@ class TripViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
     fun changeNights(destination: Destination, change: Int) {
         if (!canChangeNights(destination.nights, change)) return
         viewModelScope.launch {
-            TripRepository.updateDestinationDuration(destination, destination.nights + change)
+            repository.updateDestinationNights(destination, destination.nights + change)
         }
     }
 
     fun moveCityUp(destination: Destination) {
-        viewModelScope.launch { TripRepository.moveDestination(destination, -1) }
+        viewModelScope.launch { repository.moveDestination(destination, -1) }
     }
 
     fun moveCityDown(destination: Destination) {
-        viewModelScope.launch { TripRepository.moveDestination(destination, 1) }
+        viewModelScope.launch { repository.moveDestination(destination, 1) }
     }
 }
