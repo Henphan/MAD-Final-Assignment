@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.travelplanner_finalassignment.model.AppRepository
+import com.example.travelplanner_finalassignment.model.HomePreferencesRepository
 import com.example.travelplanner_finalassignment.viewmodel.HomeViewModel
 import com.example.travelplanner_finalassignment.viewmodel.HomeViewModelFactory
 import com.example.travelplanner_finalassignment.viewmodel.MapViewModel
@@ -32,14 +33,15 @@ data class TripRoute(val tripId: Int)
 @Composable
 fun AppNavHost(
     repository: AppRepository,
+    homePreferencesRepository: HomePreferencesRepository,
     preferenceViewModel: UserPreferenceViewModel
 ) {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = HomeRoute) {
         composable<HomeRoute> {
-            val factory = remember(repository) {
-                HomeViewModelFactory(repository)
+            val factory = remember(repository, homePreferencesRepository) {
+                HomeViewModelFactory(repository, homePreferencesRepository)
             }
 
             val viewModel: HomeViewModel = viewModel(factory = factory)
