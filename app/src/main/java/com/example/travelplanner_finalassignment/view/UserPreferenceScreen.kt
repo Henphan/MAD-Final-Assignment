@@ -82,10 +82,7 @@ fun UserPreferenceScreen(
             BottomAppBar(
                 containerColor = MaterialTheme.colorScheme.primaryContainer
             ) {
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = "Travl Plannr"
-                )
+                WaypointTitle(Modifier.padding(horizontal = 16.dp))
             }
         }
     ) {
