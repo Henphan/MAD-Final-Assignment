@@ -2,12 +2,14 @@ package com.example.travelplanner_finalassignment.view
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.travelplanner_finalassignment.model.AppRepository
+import com.example.travelplanner_finalassignment.model.HomePreferencesRepository
 import com.example.travelplanner_finalassignment.viewmodel.HomeViewModel
 import com.example.travelplanner_finalassignment.viewmodel.HomeViewModelFactory
 import com.example.travelplanner_finalassignment.viewmodel.MapViewModel
@@ -38,8 +40,9 @@ fun AppNavHost(
 
     NavHost(navController = navController, startDestination = HomeRoute) {
         composable<HomeRoute> {
+            val context = LocalContext.current.applicationContext
             val factory = remember(repository) {
-                HomeViewModelFactory(repository)
+                HomeViewModelFactory(repository, HomePreferencesRepository(context))
             }
 
             val viewModel: HomeViewModel = viewModel(factory = factory)
