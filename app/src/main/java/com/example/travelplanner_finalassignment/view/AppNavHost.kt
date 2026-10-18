@@ -79,7 +79,10 @@ fun AppNavHost(
             )
         }
         composable<SettingsRoute> {
-            UserPreferenceScreen(preferenceViewModel)
+            UserPreferenceScreen(
+                onBack = { navController.popBackStack() },
+                viewModel = preferenceViewModel
+            )
         }
     }
 }
