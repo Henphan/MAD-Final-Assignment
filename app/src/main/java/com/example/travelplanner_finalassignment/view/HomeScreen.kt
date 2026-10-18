@@ -64,7 +64,6 @@ fun HomeScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    // Id of the trip waiting for delete confirmation. rememberSaveable keeps the dialog open after rotation.
     var pendingDeleteId by rememberSaveable { mutableStateOf<Int?>(null) }
     var showNewTripDialog by rememberSaveable { mutableStateOf(false) }
     val onAddTrip = { showNewTripDialog = true }
@@ -143,7 +142,6 @@ fun HomeScreen(
 
 @Composable
 private fun SortChips(selected: TripSort, onSelect: (TripSort) -> Unit) {
-    // Scrolls sideways if the chips don't fit (e.g. with large system text).
     Row(
         Modifier
             .fillMaxWidth()
@@ -168,7 +166,6 @@ private fun TripGrid(
     onShareTrip: (TripRow) -> Unit,
     onDeleteTrip: (TripRow) -> Unit,
 ) {
-    // Adaptive grid: one column on a phone in portrait, two or more in landscape / on a tablet.
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 300.dp),
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 88.dp),
@@ -236,7 +233,6 @@ private fun EmptyState(onAddTrip: () -> Unit) {
     }
 }
 
-/** R6: hands the trip summary to another app (Messages, Instagram, email...) via the share sheet. */
 private fun shareTrip(context: Context, text: String) {
     val send = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"

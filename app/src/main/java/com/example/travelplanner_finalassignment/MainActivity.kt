@@ -10,6 +10,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.travelplanner_finalassignment.model.AppDatabase
 import com.example.travelplanner_finalassignment.model.AppRepository
+import com.example.travelplanner_finalassignment.model.HomePreferencesRepository
 import com.example.travelplanner_finalassignment.model.PreferencesRepository
 import com.example.travelplanner_finalassignment.view.AppNavHost
 import com.example.travelplanner_finalassignment.ui.theme.TravelPlannerFinalAssignmentTheme
@@ -22,6 +23,7 @@ class MainActivity : ComponentActivity() {
 
         val repository = PreferencesRepository(applicationContext)
         val appRepository = AppRepository(AppDatabase.get(applicationContext))
+        val homePreferencesRepository = HomePreferencesRepository(applicationContext)
 
         enableEdgeToEdge()
         setContent {
@@ -35,7 +37,7 @@ class MainActivity : ComponentActivity() {
                 .collectAsStateWithLifecycle(initialValue = false)
 
             TravelPlannerFinalAssignmentTheme(darkTheme = isDarkMode) {
-                AppNavHost(appRepository, viewModel)
+                AppNavHost(appRepository, homePreferencesRepository, viewModel)
             }
         }
     }

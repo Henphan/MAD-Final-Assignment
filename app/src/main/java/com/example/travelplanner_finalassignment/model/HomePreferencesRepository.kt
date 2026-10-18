@@ -10,21 +10,18 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import java.io.IOException
 
-/** How the Home screen orders trips. Saved in DataStore so it survives closing the app. */
 enum class TripSort(val label: String) {
     START_DATE("Date"),
     NAME("Name"),
     NEWEST("Newest"),
 }
 
-// Separate DataStore file from Henry's "user_preferences", so the two never clash.
 private val Context.homeDataStore by preferencesDataStore(name = "home_preferences")
 
 class HomePreferencesRepository(private val context: Context) {
 
     private val tripSortKey = stringPreferencesKey("trip_sort")
 
-    /** Emits the saved sort order, or START_DATE if nothing (or something invalid) is saved. */
     val tripSort: Flow<TripSort> = context.homeDataStore.data
         .catch { e -> if (e is IOException) emit(emptyPreferences()) else throw e }
         .map { prefs ->

@@ -2,7 +2,6 @@ package com.example.travelplanner_finalassignment.view
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -34,15 +33,15 @@ data class TripRoute(val tripId: Int)
 @Composable
 fun AppNavHost(
     repository: AppRepository,
+    homePreferencesRepository: HomePreferencesRepository,
     preferenceViewModel: UserPreferenceViewModel
 ) {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = HomeRoute) {
         composable<HomeRoute> {
-            val context = LocalContext.current.applicationContext
-            val factory = remember(repository) {
-                HomeViewModelFactory(repository, HomePreferencesRepository(context))
+            val factory = remember(repository, homePreferencesRepository) {
+                HomeViewModelFactory(repository, homePreferencesRepository)
             }
 
             val viewModel: HomeViewModel = viewModel(factory = factory)

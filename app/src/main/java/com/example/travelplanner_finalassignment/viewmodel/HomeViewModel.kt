@@ -20,7 +20,6 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
-/** One trip, already formatted for display. The screen just shows these strings. */
 data class TripRow(
     val id: Int,
     val name: String,
@@ -41,10 +40,6 @@ class HomeViewModel(
     private val todayEpochDay: () -> Long = { millisToEpochDay(System.currentTimeMillis()) },
 ) : ViewModel() {
 
-    /**
-     * Combines the trips from Room with the saved sort order from DataStore.
-     * Whenever either one changes, a new HomeUiState is produced and the screen redraws.
-     */
     val uiState: StateFlow<HomeUiState> =
         combine(repository.lTrips(), preferences.tripSort) { trips, sort ->
             HomeUiState(
@@ -62,7 +57,6 @@ class HomeViewModel(
         viewModelScope.launch { preferences.setTripSort(sort) }
     }
 
-    /** Validates the name, saves the trip, then reports the new id so the app can open it. */
     fun createTrip(name: String, startDate: Long, onCreated: (Int) -> Unit): Boolean {
         if (!isValidTripName(name)) return false
         viewModelScope.launch {
@@ -72,7 +66,6 @@ class HomeViewModel(
         return true
     }
 
-    /** Deletes a trip. Looks the trip up once by id, then deletes it. */
     fun deleteTrip(tripId: Int) {
         viewModelScope.launch {
             val trip = repository.getTrip(tripId).first() ?: return@launch
@@ -92,14 +85,12 @@ class HomeViewModel(
     }
 }
 
-/** Business logic kept out of the composable so it can be explained and tested on its own. */
 internal fun sortTrips(trips: List<Trip>, sort: TripSort): List<Trip> = when (sort) {
     TripSort.START_DATE -> trips.sortedBy { it.startDate }
     TripSort.NAME -> trips.sortedBy { it.name.lowercase() }
     TripSort.NEWEST -> trips.sortedByDescending { it.createdAt }
 }
 
-/** startDate and today are both epoch days (days since 1 Jan 1970), as stored by AddTripDialog. */
 internal fun countdownLabel(startEpochDay: Long, todayEpochDay: Long): String {
     val days = startEpochDay - todayEpochDay
     return when {
